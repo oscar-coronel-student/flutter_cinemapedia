@@ -1,6 +1,8 @@
 import 'package:cinemapedia/src/config/environment.dart';
 import 'package:cinemapedia/src/domain/datasources/movies_datasource.dart';
 import 'package:cinemapedia/src/domain/entities/movie.dart';
+import 'package:cinemapedia/src/infrastructure/mappers/movie_mapper.dart';
+import 'package:cinemapedia/src/infrastructure/models/movidb/moviedb_response.dart';
 import 'package:dio/dio.dart';
 
 class TheMovieDbDatasource implements MoviesDatasource {
@@ -24,11 +26,15 @@ class TheMovieDbDatasource implements MoviesDatasource {
       }
     );
 
-    final List<Movie> movies = [];
+    final serverResponse = MovieDbResponse.fromJson(response.data);
+    
+    final List<Movie> movieList = serverResponse.results
+    .where((e) => e.posterPath != 'no-poster')
+    .map((e){
+      return MovieMapper.movieDbToEntity(e);
+    }).toList();
 
-    response.data;
-
-    return [];
+    return movieList;
   }
 
 }
