@@ -1,15 +1,16 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:cinemapedia/src/config/helpers/human_formats.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemapedia/src/domain/entities/movie.dart';
 
-
-class MovieHorizontalListview extends StatelessWidget {
+class MovieHorizontalListview extends StatefulWidget {
 
   final List<Movie> movies;
   final String? title;
   final String? subTitle;
-  final VoidCallback? loadNextPage;
-  
+  final Future<void> Function()? loadNextPage;
+
+
   const MovieHorizontalListview({
     super.key,
     required this.movies,
@@ -19,21 +20,62 @@ class MovieHorizontalListview extends StatelessWidget {
   });
 
   @override
+  State<MovieHorizontalListview> createState() => _MovieHorizontalListviewState();
+}
+
+class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
+
+  final ScrollController scrollController = ScrollController();
+  bool isLoadingNextPage = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    scrollController.addListener((){
+      if( scrollController.position.pixels + 200 >= scrollController.position.maxScrollExtent ){
+        if( !isLoadingNextPage && widget.loadNextPage != null ){
+          loadNextPage();
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> loadNextPage() async {
+    isLoadingNextPage = true;
+    setState(() {});
+
+    widget.loadNextPage!();
+
+    if( mounted ){
+      isLoadingNextPage = false;
+      setState(() {});
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 350,
       child: Column(
         children: [
-          if( title != null || subTitle != null )
-            _Title( title: title, subTitle: subTitle ),
+          if( widget.title != null || widget.subTitle != null )
+            _Title( title: widget.title, subTitle: widget.subTitle ),
 
           Expanded(
             child: ListView.builder(
+              controller: scrollController,
               physics: const BouncingScrollPhysics(),
               scrollDirection: Axis.horizontal,
-              itemCount: movies.length,
+              itemCount: widget.movies.length,
               itemBuilder: (context, index) {
-                final movie = movies[index];
+                final movie = widget.movies[index];
 
                 return _Slide(movie: movie);
               },
@@ -44,7 +86,6 @@ class MovieHorizontalListview extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _Slide extends StatelessWidget {
@@ -68,6 +109,7 @@ class _Slide extends StatelessWidget {
           // Esto es la imagen
           SizedBox(
             width: 150,
+            height: 230,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Image.network(
@@ -101,14 +143,17 @@ class _Slide extends StatelessWidget {
             ),
           ),
 
-          Row(
-            children: [
-              Icon(Icons.star_half_outlined, color: Colors.yellow.shade800),
-              const SizedBox( width: 3 ),
-              Text('${movie.voteAverage}', style: textStyle.bodyMedium?.copyWith( color: Colors.yellow.shade800 )),
-              const SizedBox( width: 10 ),
-              Text('${ movie.popularity }', style: textStyle.bodySmall,)
-            ],
+          SizedBox(
+            width: 150,
+            child: Row(
+              children: [
+                Icon(Icons.star_half_outlined, color: Colors.yellow.shade800),
+                const SizedBox( width: 3 ),
+                Text('${movie.voteAverage}', style: textStyle.bodyMedium?.copyWith( color: Colors.yellow.shade800 )),
+                const Spacer(),
+                Text(HumanFormats.format( movie.popularity ), style: textStyle.bodySmall,)
+              ],
+            ),
           )
 
         ],
