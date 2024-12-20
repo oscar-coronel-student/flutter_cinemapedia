@@ -57,12 +57,12 @@ class _HomeViewState extends ConsumerState<_HomeView> {
           subTitle: 'Lunes 20',
           loadNextPage: ref.read(nowPlayingMoviesProvider.notifier).loadNextPage,
         ),
-        MovieHorizontalListview(
+        /* MovieHorizontalListview(
           movies: nowPlayingMovies,
           title: 'En Cines',
           subTitle: 'Lunes 20',
           loadNextPage: ref.read(nowPlayingMoviesProvider.notifier).loadNextPage,
-        ),
+        ), */
 
       ],
     );
