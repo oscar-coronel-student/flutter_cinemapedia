@@ -4,6 +4,7 @@ import 'package:cinemapedia/src/config/environment.dart';
 import 'package:cinemapedia/src/domain/datasources/movies_datasource.dart';
 import 'package:cinemapedia/src/domain/entities/movie.dart';
 import 'package:cinemapedia/src/infrastructure/mappers/movie_mapper.dart';
+import 'package:cinemapedia/src/infrastructure/models/movidb/moviedb_details.dart';
 import 'package:cinemapedia/src/infrastructure/models/movidb/moviedb_response.dart';
 import 'package:dio/dio.dart';
 
@@ -54,6 +55,17 @@ class TheMovieDbDatasource implements MoviesDatasource {
   @override
   Future<List<Movie>> getUpcoming({int page = 1}) async {
     return await _getMovieList(endpoint: TmdbEndpoints.upcoming, page: page);
+  }
+  
+  @override
+  Future<Movie> getMovie({required String movieId}) async {
+    final String endpoint = '/$movieId';
+    final response = await dio.get(endpoint);
+
+    final movieModel = MoviedbDetails.fromJson(response.data);
+    final movieEntity = MovieMapper.movieDbDetailToEntity(movieModel);
+
+    return movieEntity;
   }
 
 }
