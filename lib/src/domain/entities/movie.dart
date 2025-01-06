@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Movie {
   final bool adult;
   final String backdropPath;
@@ -30,4 +32,28 @@ class Movie {
     required this.voteAverage,
     required this.voteCount
   });
+
+  Map<String, dynamic> toJson(){
+    return {
+      'adult': adult,
+      'backdropPath': backdropPath,
+      'genreIds': genreIds,
+      'id': id,
+      'originalLanguage': originalLanguage,
+      'originalTitle': originalTitle,
+      'overview': overview,
+      'popularity': popularity,
+      'posterPath': posterPath,
+      'releaseDate': releaseDate.toIso8601String(),
+      'title': title,
+      'video': video,
+      'voteAverage': voteAverage,
+      'voteCount': voteCount,
+    };
+  }
+
+  @override
+  String toString() {
+    return json.encode(toJson());
+  }
 }
