@@ -7,7 +7,7 @@ class MovieRepositoryImpl implements MoviesRepository {
   final MoviesDatasource moviesDatasource;
 
   const MovieRepositoryImpl({
-    required this.moviesDatasource
+    required this.moviesDatasource,
   });
   
   @override

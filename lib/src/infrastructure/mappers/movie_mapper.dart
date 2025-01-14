@@ -28,7 +28,7 @@ class MovieMapper {
     return Movie(
       adult: movieDetail.adult,
       backdropPath: Url.getBackdropUrl(movieDetail.backdropPath),
-      genreIds: movieDetail.genres.map((e) => e.id.toString()).toList(),
+      genreIds: movieDetail.genres.map((e) => e.name.toString()).toList(),
       id: movieDetail.id,
       originalLanguage: movieDetail.originalLanguage,
       originalTitle: movieDetail.originalTitle,

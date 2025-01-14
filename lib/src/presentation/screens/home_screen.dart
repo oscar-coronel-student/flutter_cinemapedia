@@ -75,6 +75,7 @@ class _HomeViewState extends ConsumerState<_HomeView> {
                 MoviesSlideshow(movies: moviesSlideShow),
                 
                 MovieHorizontalListview(
+                  identifier: 'en_cines',
                   movies: nowPlayingMovies,
                   title: 'En Cines',
                   subTitle: 'Lunes 20',
@@ -82,6 +83,7 @@ class _HomeViewState extends ConsumerState<_HomeView> {
                 ),
                 
                 MovieHorizontalListview(
+                  identifier: 'proximamente',
                   movies: upcomingMovies,
                   title: 'Próximamente',
                   subTitle: 'En este mes',
@@ -89,12 +91,14 @@ class _HomeViewState extends ConsumerState<_HomeView> {
                 ),
 
                 MovieHorizontalListview(
+                  identifier: 'populares',
                   movies: popularMovies,
                   title: 'Populares',
                   loadNextPage: ref.read(popularMoviesProvider.notifier).loadNextPage,
                 ),
                 
                 MovieHorizontalListview(
+                  identifier: 'mejores_calificadas',
                   movies: topRatedMovies,
                   title: 'Mejor calificadas',
                   subTitle: 'Desde siempre',

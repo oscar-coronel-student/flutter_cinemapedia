@@ -12,13 +12,16 @@ class MovieHorizontalListview extends StatefulWidget {
   final String? subTitle;
   final Future<void> Function()? loadNextPage;
 
+  final String identifier;
+
 
   const MovieHorizontalListview({
     super.key,
     required this.movies,
+    required this.identifier,
     this.title,
     this.subTitle,
-    this.loadNextPage
+    this.loadNextPage,
   });
 
   @override
@@ -80,7 +83,7 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
                 final movie = widget.movies[index];
 
                 return FadeInRight(
-                  child: _Slide(movie: movie)
+                  child: _Slide(movie: movie, identifier: widget.identifier)
                 );
               },
             )
@@ -95,15 +98,19 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
 class _Slide extends StatelessWidget {
   
   final Movie movie;
+  final String identifier;
 
   const _Slide({
-    required this.movie
+    required this.movie,
+    required this.identifier
   });
 
   @override
   Widget build(BuildContext context) {
 
     final textStyle = Theme.of(context).textTheme;
+
+    final String imageTag = 'movie_poster_path_${ identifier }_${ movie.id }';
 
     return Container(
       margin: const EdgeInsets.symmetric( horizontal: 8 ),
@@ -114,28 +121,31 @@ class _Slide extends StatelessWidget {
           SizedBox(
             width: 150,
             height: 230,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.network(
-                fit: BoxFit.cover,
-                movie.posterPath,
-                width: 150,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if( loadingProgress == null ){
-                    return GestureDetector(
-                      onTap: (){
-                        context.go('${ HomeScreen.path }/movie/${ movie.id }');
-                      },
-                      child: FadeIn(child: child)
+            child: Hero(
+              tag: imageTag,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.network(
+                  fit: BoxFit.cover,
+                  movie.posterPath,
+                  width: 150,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if( loadingProgress == null ){
+                      return GestureDetector(
+                        onTap: (){
+                          context.go('${ HomeScreen.path }/movie/${ movie.id }/$imageTag');
+                        },
+                        child: FadeIn(child: child)
+                      );
+                    }
+                    return const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Center(
+                        child: CircularProgressIndicator( strokeWidth: 2 )
+                      ),
                     );
-                  }
-                  return const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Center(
-                      child: CircularProgressIndicator( strokeWidth: 2 )
-                    ),
-                  );
-                },
+                  },
+                ),
               ),
             ),
           ),
