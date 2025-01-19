@@ -6,7 +6,7 @@ class TmdbEndpoints {
   static const String topRated = '/top_rated';
 
   static String movieCredits(String movieId){
-    return '$movieId/credits';
+    return '/$movieId/credits';
   }
 
 }

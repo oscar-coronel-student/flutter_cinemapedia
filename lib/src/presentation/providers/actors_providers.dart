@@ -15,21 +15,27 @@ final actorsByMovieProvider = StateNotifierProvider.autoDispose<ActorsByMovieNot
   );
 });
 
+typedef GetActors = Future<List<Actor>> Function({ required String movieId });
 
 class ActorsByMovieNotifier extends StateNotifier<ActorsByMovieState> implements ProviderDimounted{
 
-  Future<List<Actor>> Function({ required String movieId }) getActors;
-  KeepAliveLink link;
+  final GetActors _getActors;
+  final KeepAliveLink _link;
 
   ActorsByMovieNotifier({
-    required this.getActors,
-    required this.link
-  }): super(const ActorsByMovieState());
+    required GetActors getActors,
+    required KeepAliveLink link
+  }):
+  _getActors = getActors,
+  _link = link,
+  super(const ActorsByMovieState());
 
   Future<void> loadActorsByMovie( String movieId ) async {
-    state = state.copyWith(loading: true, error: '');
+    if(mounted){
+      state = state.copyWith(loading: true, error: '');
+    }
     try {
-      final actors = await getActors(movieId: movieId);
+      final actors = await _getActors(movieId: movieId);
 
       if(mounted){
         state = state.copyWith(loading: false, actors: actors, error: '');
@@ -43,7 +49,7 @@ class ActorsByMovieNotifier extends StateNotifier<ActorsByMovieState> implements
   
   @override
   void customDimounted() {
-    link.close();
+    _link.close();
   }
   
 }

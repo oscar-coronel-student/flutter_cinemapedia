@@ -1,4 +1,6 @@
+import 'package:cinemapedia/src/domain/entities/actor.dart';
 import 'package:cinemapedia/src/domain/entities/movie.dart';
+import 'package:cinemapedia/src/presentation/providers/actors_providers.dart';
 import 'package:cinemapedia/src/presentation/providers/movie_info_provider.dart';
 import 'package:cinemapedia/src/presentation/widgets/gradient_bg.dart';
 import 'package:flutter/material.dart';
@@ -23,38 +25,21 @@ class MovieScreen extends ConsumerStatefulWidget {
 
 class _MovieScreenState extends ConsumerState<MovieScreen> {
 
-  bool isLoading = true;
-  Movie? movie;
-
   @override
   void initState() {
     super.initState();
-    loadMovie();
   }
-
-
-  Future<void> loadMovie() async {
-    final String movieId = widget.movieId;
-
-    final movieNotifier = ref.read(movieInfoProvider.notifier);
-
-    await movieNotifier.loadMovie( movieId );
-
-    if( mounted ){
-      isLoading = false;
-      setState(() {});
-    }
-  }
-
 
   @override
   Widget build(BuildContext context) {
 
-    final moviesData = ref.watch(movieInfoProvider);
-    movie = moviesData[widget.movieId];
+    final moviesState = ref.watch(movieInfoProvider);
+
+    final bool hasMovie = moviesState.data.containsKey(widget.movieId);
+    final Movie? movie = moviesState.data[widget.movieId];
 
     return Scaffold(
-      body: isLoading 
+      body: moviesState.isLoading && !hasMovie
       ? const Center(
         child: CircularProgressIndicator(),
       )
@@ -166,17 +151,22 @@ class _PosterPath extends StatelessWidget {
   }
 }
 
-class _MovieDetails extends StatelessWidget {
+class _MovieDetails extends ConsumerWidget {
 
   final Movie movie;
 
   const _MovieDetails({ required this.movie });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
 
     final textStyles = Theme.of(context).textTheme;
     final size = MediaQuery.of(context).size;
+
+    final actorsByMovieState = ref.watch( actorsByMovieProvider );
+
+    final String actorsError = actorsByMovieState.error;
+    final List<Actor> actors = actorsByMovieState.actors;
 
     return SizedBox(
       width: double.infinity,
@@ -235,7 +225,13 @@ class _MovieDetails extends StatelessWidget {
             ),
           ),
 
-          // TODO: Mostrar actores ListView
+          actorsByMovieState.loading
+          ? const SizedBox(
+            child: Center(child: CircularProgressIndicator()),
+          )
+          : (actorsError.isEmpty
+            ? Text( actors.length.toString() )
+            : Text(actorsError)),
 
           const SizedBox(height: 100)
       

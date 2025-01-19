@@ -1,8 +1,11 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/src/config/helpers/human_formats.dart';
+import 'package:cinemapedia/src/presentation/providers/actors_providers.dart';
+import 'package:cinemapedia/src/presentation/providers/movie_info_provider.dart';
 import 'package:cinemapedia/src/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemapedia/src/domain/entities/movie.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class MovieHorizontalListview extends StatefulWidget {
@@ -95,7 +98,7 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
   }
 }
 
-class _Slide extends StatelessWidget {
+class _Slide extends ConsumerWidget {
   
   final Movie movie;
   final String identifier;
@@ -106,7 +109,7 @@ class _Slide extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
 
     final textStyle = Theme.of(context).textTheme;
 
@@ -133,6 +136,12 @@ class _Slide extends StatelessWidget {
                     if( loadingProgress == null ){
                       return GestureDetector(
                         onTap: (){
+                          final movieNotifier = ref.read(movieInfoProvider.notifier);
+                          final actorsByMovieNotifier = ref.read(actorsByMovieProvider.notifier);
+
+                          movieNotifier.loadMovie( movie.id.toString() );
+                          actorsByMovieNotifier.loadActorsByMovie( movie.id.toString() );
+
                           context.go('${ HomeScreen.path }/movie/${ movie.id }/$imageTag');
                         },
                         child: FadeIn(child: child)
