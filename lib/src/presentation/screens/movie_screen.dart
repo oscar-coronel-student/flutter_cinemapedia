@@ -1,8 +1,10 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/src/domain/entities/actor.dart';
 import 'package:cinemapedia/src/domain/entities/movie.dart';
 import 'package:cinemapedia/src/presentation/providers/actors_providers.dart';
 import 'package:cinemapedia/src/presentation/providers/movie_info_provider.dart';
 import 'package:cinemapedia/src/presentation/widgets/gradient_bg.dart';
+import 'package:cinemapedia/src/presentation/widgets/list_views/actors/actors_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -102,12 +104,12 @@ class _CustomSliverAppBar extends StatelessWidget {
       foregroundColor: Colors.white,
       expandedHeight: size.height * 0.7,
       flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.symmetric( horizontal: 10, vertical: 5 ),
+        /* titlePadding: const EdgeInsets.symmetric( horizontal: 10, vertical: 5 ),
         title: Text(
           movie.title,
           style: const TextStyle( color: Colors.white, fontSize: 20 ),
           textAlign: TextAlign.start,
-        ),
+        ), */
         background: Stack(
           children: [
 
@@ -152,6 +154,18 @@ class _PosterPath extends StatelessWidget {
         child: Image.network(
           movie.posterPath,
           fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            
+            if( loadingProgress == null ) {
+              return FadeIn(
+                duration: const Duration( seconds: 1 ),
+                child: child
+              );
+            }
+
+            return const SizedBox();
+
+          },
         ),
       ),
     );
@@ -239,10 +253,10 @@ class _MovieDetails extends ConsumerWidget {
             child: Center(child: CircularProgressIndicator()),
           )
           : (actorsError.isEmpty
-            ? Text( actors.length.toString() )
+            ? ActorsListView( actors: actors )
             : Text(actorsError)),
 
-          const SizedBox(height: 100)
+          const SizedBox(height: 30)
       
         ],
       ),
