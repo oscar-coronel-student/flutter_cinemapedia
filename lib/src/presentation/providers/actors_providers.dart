@@ -3,8 +3,7 @@ import 'package:cinemapedia/src/presentation/abstract_classes/provider_dimounted
 import 'package:cinemapedia/src/presentation/providers/actors_repository_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
-final actorsByMovieProvider = StateNotifierProvider.autoDispose<ActorsByMovieNotifier, ActorsByMovieState>((ref){
+final actorsByMovieProvider = StateNotifierProvider.autoDispose<ActorsByMovieNotifier, Map<String, ActorsByMovie>>((ref){
   
   final link = ref.keepAlive();
   final getMovieActors = ref.watch( actorsRepositoryProvider ).getMovieActors;
@@ -17,7 +16,9 @@ final actorsByMovieProvider = StateNotifierProvider.autoDispose<ActorsByMovieNot
 
 typedef GetActors = Future<List<Actor>> Function({ required String movieId });
 
-class ActorsByMovieNotifier extends StateNotifier<ActorsByMovieState> implements ProviderDimounted{
+class ActorsByMovieNotifier extends StateNotifier<Map<String, ActorsByMovie>> implements ProviderDimounted{
+
+  bool isGeneralLoading = false;
 
   final GetActors _getActors;
   final KeepAliveLink _link;
@@ -28,22 +29,35 @@ class ActorsByMovieNotifier extends StateNotifier<ActorsByMovieState> implements
   }):
   _getActors = getActors,
   _link = link,
-  super(const ActorsByMovieState());
+  super({});
 
   Future<void> loadActorsByMovie( String movieId ) async {
-    if(mounted){
-      state = state.copyWith(loading: true, error: '');
-    }
+    final bool hasActors = state.containsKey(movieId);
+    final ActorsByMovie? currentActors = state[movieId];
+    if( isGeneralLoading || (hasActors && currentActors?.error.isEmpty == true ) ) return;
+
+    isGeneralLoading = true;
+    state = { ...state, movieId: const ActorsByMovie( loading: true ) };
+    final actorsByMovie = state[movieId]!;
+
     try {
       final actors = await _getActors(movieId: movieId);
 
-      if(mounted){
-        state = state.copyWith(loading: false, actors: actors, error: '');
+      if( mounted ){
+        state = { 
+          ...state,
+          movieId: actorsByMovie.copyWith( loading: false, actors: actors, error: '' )
+        };
       }
     } catch (e) {
       if(mounted){
-        state = state.copyWith(loading: false, error: e.toString());
+        state = { 
+          ...state,
+          movieId: actorsByMovie.copyWith( loading: false, actors: [], error: e.toString() )
+        };
       }
+    } finally {
+      isGeneralLoading = false;
     }
   }
   
@@ -54,23 +68,23 @@ class ActorsByMovieNotifier extends StateNotifier<ActorsByMovieState> implements
   
 }
 
-class ActorsByMovieState {
+class ActorsByMovie {
 
   final bool loading;
   final List<Actor> actors;
   final String error;
 
-  const ActorsByMovieState({
+  const ActorsByMovie({
     this.loading = false,
     this.actors = const [],
     this.error = ''
   });
 
-  ActorsByMovieState copyWith({
+  ActorsByMovie copyWith({
     bool? loading,
     List<Actor>? actors,
     String? error
-  }) => ActorsByMovieState(
+  }) => ActorsByMovie(
     loading: loading ?? this.loading,
     actors: actors ?? this.actors,
     error: error ?? this.error

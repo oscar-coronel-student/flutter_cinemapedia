@@ -1,7 +1,5 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/src/config/helpers/human_formats.dart';
-import 'package:cinemapedia/src/presentation/providers/actors_providers.dart';
-import 'package:cinemapedia/src/presentation/providers/movie_info_provider.dart';
 import 'package:cinemapedia/src/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemapedia/src/domain/entities/movie.dart';
@@ -136,12 +134,6 @@ class _Slide extends ConsumerWidget {
                     if( loadingProgress == null ){
                       return GestureDetector(
                         onTap: (){
-                          final movieNotifier = ref.read(movieInfoProvider.notifier);
-                          final actorsByMovieNotifier = ref.read(actorsByMovieProvider.notifier);
-
-                          movieNotifier.loadMovie( movie.id.toString() );
-                          actorsByMovieNotifier.loadActorsByMovie( movie.id.toString() );
-
                           context.go('${ HomeScreen.path }/movie/${ movie.id }/$imageTag');
                         },
                         child: FadeIn(child: child)

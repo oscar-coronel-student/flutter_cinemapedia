@@ -27,6 +27,13 @@ class _MovieScreenState extends ConsumerState<MovieScreen> {
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      final movieNotifier = ref.read(movieInfoProvider.notifier);
+      final actorsByMovieNotifier = ref.read(actorsByMovieProvider.notifier);
+
+      movieNotifier.loadMovie( widget.movieId );
+      actorsByMovieNotifier.loadActorsByMovie( widget.movieId );
+    });
     super.initState();
   }
 
@@ -39,7 +46,7 @@ class _MovieScreenState extends ConsumerState<MovieScreen> {
     final Movie? movie = moviesState.data[widget.movieId];
 
     return Scaffold(
-      body: moviesState.isLoading && !hasMovie
+      body: moviesState.isLoading || !hasMovie
       ? const Center(
         child: CircularProgressIndicator(),
       )
@@ -163,10 +170,12 @@ class _MovieDetails extends ConsumerWidget {
     final textStyles = Theme.of(context).textTheme;
     final size = MediaQuery.of(context).size;
 
-    final actorsByMovieState = ref.watch( actorsByMovieProvider );
+    final actorsByMovieMap = ref.watch( actorsByMovieProvider );
+    final actorsByMovie = actorsByMovieMap[movie.id.toString()];
 
-    final String actorsError = actorsByMovieState.error;
-    final List<Actor> actors = actorsByMovieState.actors;
+    final String actorsError = actorsByMovie == null ? '' : actorsByMovie.error;
+    final List<Actor> actors = actorsByMovie == null ? [] : actorsByMovie.actors;
+    final bool loading = actorsByMovie == null ? true : actorsByMovie.loading;
 
     return SizedBox(
       width: double.infinity,
@@ -225,7 +234,7 @@ class _MovieDetails extends ConsumerWidget {
             ),
           ),
 
-          actorsByMovieState.loading
+          loading
           ? const SizedBox(
             child: Center(child: CircularProgressIndicator()),
           )
