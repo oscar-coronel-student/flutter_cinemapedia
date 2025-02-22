@@ -26,6 +26,8 @@ class TmdbSearchDatasource extends SearchDatasource {
 
   @override
   Future<List<Movie>> searchMovies({required String searchText, int page = 1}) async {
+    if( searchText.trim().isEmpty ) return [];
+
     try {
       final response = await _dio.get(
         TmdbEndpoints.searchMovies, 
