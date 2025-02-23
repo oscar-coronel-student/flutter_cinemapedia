@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/src/domain/entities/movie.dart';
+import 'package:cinemapedia/src/presentation/widgets/list_views/movies/movie_simple_listview.dart';
 import 'package:flutter/material.dart';
 
 
@@ -60,49 +61,10 @@ class SearchMoviesDelegate extends SearchDelegate<Movie?> {
 
         final List<Movie> movies = snapshot.data ?? []; 
 
-        return ListView.builder(
-          
-          itemCount: movies.length,
-          itemBuilder: (context, index) {
-            final movie = movies[index];
-
-            return Column(
-              children: [
-                ListTile(
-                  onTap: (){
-
-                  },
-                  minTileHeight: 150,
-                  leading: SizedBox(
-                    width: 100,
-                    height: double.infinity,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(7),
-                      clipBehavior: Clip.hardEdge,
-                      child: Image.network(
-                        movie.posterPath,
-                        fit: BoxFit.cover,
-                        height: 150,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if( loadingProgress == null ) return child;
-                    
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  title: Text(movie.title),
-                  subtitle: Text(
-                    movie.overview,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const Divider( height: 0 )
-              ],
-            );
+        return MovieSimpleListview(
+          movies: movies,
+          onTapItem: (movie) {
+            close(context, movie);
           },
         );
       },

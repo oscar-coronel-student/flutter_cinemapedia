@@ -1,6 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/src/config/helpers/human_formats.dart';
-import 'package:cinemapedia/src/presentation/screens/home_screen.dart';
+import 'package:cinemapedia/src/presentation/screens/movie_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemapedia/src/domain/entities/movie.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -134,7 +134,15 @@ class _Slide extends ConsumerWidget {
                     if( loadingProgress == null ){
                       return GestureDetector(
                         onTap: (){
-                          context.go('${ HomeScreen.path }/movie/${ movie.id }/$imageTag');
+                          context.goNamed(
+                            MovieScreen.name,
+                            pathParameters: {
+                              'id': movie.id.toString()
+                            },
+                            queryParameters: {
+                              'image_tag': imageTag
+                            }
+                          );
                         },
                         child: FadeIn(child: child)
                       );

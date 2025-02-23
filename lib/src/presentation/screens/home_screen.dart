@@ -7,7 +7,7 @@ import 'package:cinemapedia/src/presentation/providers/movies_providers.dart';
 import 'package:cinemapedia/src/presentation/providers/movies_slideshow_provider.dart';
 import 'package:cinemapedia/src/presentation/widgets/custom_appbar.dart';
 import 'package:cinemapedia/src/presentation/widgets/custom_bottom_navigationbar.dart';
-import 'package:cinemapedia/src/presentation/widgets/movie_horizontal_listview.dart';
+import 'package:cinemapedia/src/presentation/widgets/list_views/movies/movie_horizontal_listview.dart';
 import 'package:cinemapedia/src/presentation/widgets/movies_slideshow.dart';
 
 class HomeScreen extends StatelessWidget {

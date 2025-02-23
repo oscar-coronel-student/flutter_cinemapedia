@@ -1,5 +1,5 @@
 import 'package:cinemapedia/src/domain/entities/actor.dart';
-import 'package:cinemapedia/src/presentation/widgets/list_views/actors/actor_slide.dart';
+import 'package:cinemapedia/src/presentation/widgets/list_view_items/actor_slide.dart';
 import 'package:flutter/material.dart';
 
 class ActorsListView extends StatelessWidget {

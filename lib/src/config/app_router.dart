@@ -13,10 +13,10 @@ final appRouter = GoRouter(
       routes: [
         GoRoute(
           name: MovieScreen.name,
-          path: 'movie/:id/:image_tag',
+          path: 'movie/:id',
           builder: (context, state) {
             final String movieId = state.pathParameters['id'] ?? 'no-id';
-            final String imageTag = state.pathParameters['image_tag'] ?? DateTime.now().toIso8601String();
+            final String imageTag = state.uri.queryParameters['image_tag'] ?? DateTime.now().toIso8601String();
             return MovieScreen(movieId: movieId, imageTag: imageTag);
           },
         ),
