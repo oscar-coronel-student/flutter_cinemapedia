@@ -1,22 +1,23 @@
 import 'dart:async';
 import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/src/domain/entities/movie.dart';
+import 'package:cinemapedia/src/presentation/providers/movies/movies_searched_provider.dart';
 import 'package:cinemapedia/src/presentation/widgets/list_views/movies/movie_simple_listview.dart';
 import 'package:flutter/material.dart';
-
-
-typedef SearchMoviesCallback = Future<List<Movie>> Function({ required String searchText });
 
 class SearchMoviesDelegate extends SearchDelegate<Movie?> {
 
   final SearchMoviesCallback searchMovies;
-  StreamController<List<Movie>> debounceMovies = StreamController.broadcast();
+  final List<Movie> moviesSearched;
+  StreamController<List<Movie>> debounceMovies = StreamController.broadcast( sync: true );
   Timer? _debounceTimer;
+  bool isFirstQueryChange = true;
 
   SearchMoviesDelegate({
-    required this.searchMovies
+    required this.searchMovies,
+    this.moviesSearched = const []
   }): super(searchFieldLabel: 'Buscar películas');
-
+  
 
   @override
   void close(BuildContext context, Movie? result) {
@@ -29,16 +30,18 @@ class SearchMoviesDelegate extends SearchDelegate<Movie?> {
   }
 
   void _onQueryChanged(String query){
+    if(isFirstQueryChange){
+      isFirstQueryChange = false;
+      return;
+    }
+
     if( _debounceTimer?.isActive ?? false ) _debounceTimer!.cancel();
 
     _debounceTimer = Timer(const Duration(seconds: 1), () async {
-      if( query.isEmpty ) {
-        debounceMovies.add([]);
-        return;
-      }
-
       final movies = await searchMovies( searchText: query );
-      debounceMovies.add(movies);
+      if( !debounceMovies.isClosed ){
+        debounceMovies.add(movies);
+      }
     });
   }
 
@@ -83,6 +86,7 @@ class SearchMoviesDelegate extends SearchDelegate<Movie?> {
     
     return StreamBuilder(
       stream: debounceMovies.stream,
+      initialData: moviesSearched,
       builder: (context, snapshot){
         if( !snapshot.hasData ){
           return const Center(
